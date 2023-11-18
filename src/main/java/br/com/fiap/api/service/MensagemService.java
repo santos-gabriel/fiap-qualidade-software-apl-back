@@ -1,12 +1,13 @@
 package br.com.fiap.api.service;
 
 import br.com.fiap.api.model.Mensagem;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+/**
+ * TBD.
+ */
 public interface MensagemService {
 
     Mensagem registrarMensagem(Mensagem mensagem);
@@ -16,5 +17,7 @@ public interface MensagemService {
     Mensagem alterarMensagem(UUID id, Mensagem mensagemAtualizada);
 
     boolean removerMensagem(UUID id);
+
+    Page<Mensagem> listarMensagens(Pageable pageable);
 
 }

@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
+import static br.com.fiap.api.util.MensagemHelper.gerarMensagem;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,7 +22,7 @@ import static org.mockito.Mockito.times;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @Transactional
-public class MensagemRepositoryIT {
+class MensagemRepositoryIT {
 
     @Autowired
     private MensagemRepository mensagemRepository;
@@ -28,7 +30,7 @@ public class MensagemRepositoryIT {
     @Test
     void devePermitirCriarTabela() {
         var totalDeRegistros = mensagemRepository.count();
-        assertThat(totalDeRegistros).isGreaterThan(0);
+        assertThat(totalDeRegistros).isPositive();
     }
 
     @Test
@@ -101,11 +103,16 @@ public class MensagemRepositoryIT {
         assertThat(resultadosObtidos).hasSizeGreaterThan(0);
     }
 
-    private Mensagem gerarMensagem() {
-        return Mensagem.builder()
-                .usuario("Jose")
-                .conteudo("conteúdo da mensagem")
-                .build();
+    @Test
+    void devePermitirListarMensagens_ComPaginacao() {
+        // Act
+        var resultadosObtidos = mensagemRepository.listarMensagens(Pageable.unpaged());
+
+        // Assert
+        assertThat(resultadosObtidos).hasSizeGreaterThan(0);
+        assertThat(resultadosObtidos.getContent()).asList().allSatisfy(mensagem -> {
+            assertThat(mensagem).isNotNull().isInstanceOf(Mensagem.class);
+        });
     }
 
     private Mensagem registrarMensagem(Mensagem mensagem) {

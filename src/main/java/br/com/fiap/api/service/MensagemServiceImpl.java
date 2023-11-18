@@ -4,10 +4,9 @@ import br.com.fiap.api.exception.MensagemNotFoundException;
 import br.com.fiap.api.model.Mensagem;
 import br.com.fiap.api.repository.MensagemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,9 +17,6 @@ public class MensagemServiceImpl implements MensagemService {
 
     @Override
     public Mensagem registrarMensagem(Mensagem mensagem) {
-//        if (Objects.isNull(mensagem)){
-//
-//        }
         mensagem.setId(UUID.randomUUID());
         return repository.save(mensagem);
     }
@@ -33,7 +29,7 @@ public class MensagemServiceImpl implements MensagemService {
     @Override
     public Mensagem alterarMensagem(UUID id, Mensagem mensagemAtualizada) {
         var mensagem = buscarMensagem(id);
-        if (!mensagem.getId().equals(id)) {
+        if (!mensagem.getId().equals(mensagemAtualizada.getId())) {
             throw new MensagemNotFoundException("Mensagem atualizada não apresenta o ID correto");
         }
         mensagem.setConteudo(mensagemAtualizada.getConteudo());
@@ -42,6 +38,13 @@ public class MensagemServiceImpl implements MensagemService {
 
     @Override
     public boolean removerMensagem(UUID id) {
-        return false;
+        buscarMensagem(id);
+        repository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public Page<Mensagem> listarMensagens(Pageable pageable) {
+        return repository.listarMensagens(pageable);
     }
 }
