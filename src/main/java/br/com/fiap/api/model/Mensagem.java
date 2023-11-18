@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.annotation.Generated;
 import javax.persistence.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class Mensagem {
 
     @Id
+    @GenericGenerator(name = "uuid", strategy = "uuid")
     private UUID id;
 
     @Column(nullable = false)

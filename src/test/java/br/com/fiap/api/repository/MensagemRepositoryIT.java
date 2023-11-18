@@ -36,7 +36,7 @@ public class MensagemRepositoryIT {
         // Arrange
         var id = UUID.randomUUID();
         var mensagem = gerarMensagem();
-//        mensagem.setId(id);
+        mensagem.setId(id);
 
         // Act
         var mensagemRecebida = mensagemRepository.save(mensagem);
@@ -54,8 +54,9 @@ public class MensagemRepositoryIT {
     @Test
     void devePermitirBuscarMensagem() {
         // Arrange
-//         var id = UUID.fromString("65b1bbee-c784-4457-be6d-d00b0be5c9e0");
+//         var id = UUID.fromString("af87b174-0343-48fd-9069-46ca2e3df9e7");
         var id = UUID.randomUUID();
+
         var mensagem = gerarMensagem();
         mensagem.setId(id);
         registrarMensagem(mensagem);
@@ -76,7 +77,11 @@ public class MensagemRepositoryIT {
     @Test
     void devePermitirRemoverMensagem() {
         // Arrange
-        var id = UUID.fromString("592ac344-9f12-40cd-8ed9-1fde6ad9006e");
+        // var id = UUID.fromString("592ac344-9f12-40cd-8ed9-1fde6ad9006e");
+        var id = UUID.randomUUID();
+        var mensagem = gerarMensagem();
+        mensagem.setId(id);
+        registrarMensagem(mensagem);
 
         // Act
         mensagemRepository.deleteById(id);
