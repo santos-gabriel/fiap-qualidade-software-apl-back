@@ -1,9 +1,9 @@
 package br.com.fiap.api.repository;
 
 import br.com.fiap.api.model.Mensagem;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -15,10 +15,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.assertj.core.api.Assertions.*;
+import static br.com.fiap.api.util.MensagemHelper.gerarMensagem;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static br.com.fiap.api.util.MensagemHelper.*;
 
 class MensagemRepositoryTest {
 
@@ -37,92 +36,104 @@ class MensagemRepositoryTest {
         openMocks.close();
     }
 
-    @Test
-    void devePermitirRegistrarMensagem() {
-        // Arrange
-        var mensagem = gerarMensagem();
-        when(mensagemRepository.save(any(Mensagem.class))).thenReturn(mensagem);
-        // Act
-        var mensagemRegistrada = mensagemRepository.save(mensagem);
+    @Nested
+    class RegistrarMensagem {
+        @Test
+        void devePermitirRegistrarMensagem() {
+            // Arrange
+            var mensagem = gerarMensagem();
+            when(mensagemRepository.save(any(Mensagem.class))).thenReturn(mensagem);
+            // Act
+            var mensagemRegistrada = mensagemRepository.save(mensagem);
 
-        // Assert
-        assertThat(mensagemRegistrada)
-                .isNotNull()
-                .isEqualTo(mensagem);
-        verify(mensagemRepository, times(1)).save(any(Mensagem.class));
+            // Assert
+            assertThat(mensagemRegistrada)
+                    .isNotNull()
+                    .isEqualTo(mensagem);
+            verify(mensagemRepository, times(1)).save(any(Mensagem.class));
+        }
     }
 
-    @Test
-    void devePermitirBuscarMensagem() {
-        // Arrange
-        var id = UUID.randomUUID();
-        var mensagem = gerarMensagem();
-        mensagem.setId(id);
-        when(mensagemRepository.findById(any(UUID.class))).thenReturn(Optional.of(mensagem));
+    @Nested
+    class BuscarMensagem {
+        @Test
+        void devePermitirBuscarMensagem() {
+            // Arrange
+            var id = UUID.randomUUID();
+            var mensagem = gerarMensagem();
+            mensagem.setId(id);
+            when(mensagemRepository.findById(any(UUID.class))).thenReturn(Optional.of(mensagem));
 
-        // Act
-        var mensagemRecebidaOpcional = mensagemRepository.findById(id);
+            // Act
+            var mensagemRecebidaOpcional = mensagemRepository.findById(id);
 
-        // Assert
-        assertThat(mensagemRecebidaOpcional)
-                .isPresent()
-                .containsSame(mensagem);
+            // Assert
+            assertThat(mensagemRecebidaOpcional)
+                    .isPresent()
+                    .containsSame(mensagem);
 
-        mensagemRecebidaOpcional.ifPresent(mensagemRecebida -> {
-            assertThat(mensagemRecebida.getId()).isEqualTo(mensagem.getId());
-            assertThat(mensagemRecebida.getConteudo()).isEqualTo(mensagem.getConteudo());
-        });
-        verify(mensagemRepository, times(1)).findById(any(UUID.class));
+            mensagemRecebidaOpcional.ifPresent(mensagemRecebida -> {
+                assertThat(mensagemRecebida.getId()).isEqualTo(mensagem.getId());
+                assertThat(mensagemRecebida.getConteudo()).isEqualTo(mensagem.getConteudo());
+            });
+            verify(mensagemRepository, times(1)).findById(any(UUID.class));
 
+        }
     }
 
-    @Test
-    void devePermitirRemoverMensagem() {
-        // Arrange
-        var id = UUID.randomUUID();
-        doNothing().when(mensagemRepository).deleteById(any(UUID.class));
+    @Nested
+    class RemoverMensagem {
+        @Test
+        void devePermitirRemoverMensagem() {
+            // Arrange
+            var id = UUID.randomUUID();
+            doNothing().when(mensagemRepository).deleteById(any(UUID.class));
 
-        // Act
-        mensagemRepository.deleteById(id);
+            // Act
+            mensagemRepository.deleteById(id);
 
-        // Assert
-        verify(mensagemRepository, times(1)).deleteById(any(UUID.class));
+            // Assert
+            verify(mensagemRepository, times(1)).deleteById(any(UUID.class));
+        }
     }
 
-    @Test
-    void devePermitirListarMensagens() {
-        // Arrange
-        var mensagem1 = gerarMensagem();
-        var mensagem2 = gerarMensagem();
-        var listaMensagens = Arrays.asList(mensagem1, mensagem2);
-        when(mensagemRepository.findAll()).thenReturn(listaMensagens);
+    @Nested
+    class ListarMensagens {
+        @Test
+        void devePermitirListarMensagens() {
+            // Arrange
+            var mensagem1 = gerarMensagem();
+            var mensagem2 = gerarMensagem();
+            var listaMensagens = Arrays.asList(mensagem1, mensagem2);
+            when(mensagemRepository.findAll()).thenReturn(listaMensagens);
 
-        // Act
-        var mensagensRecebidas = mensagemRepository.findAll();
+            // Act
+            var mensagensRecebidas = mensagemRepository.findAll();
 
-        // Assert
-        assertThat(mensagensRecebidas)
-                .hasSize(2)
-                .containsExactlyInAnyOrder(mensagem1, mensagem2);
-        verify(mensagemRepository, times(1)).findAll();
+            // Assert
+            assertThat(mensagensRecebidas)
+                    .hasSize(2)
+                    .containsExactlyInAnyOrder(mensagem1, mensagem2);
+            verify(mensagemRepository, times(1)).findAll();
 
-    }
+        }
 
-    @Test
-    void devePermitirListarMensagens_ComPaginacao() {
-        // Arrange
-        Page<Mensagem> listaDeMensagens = new PageImpl<>(Arrays.asList(gerarMensagem(), gerarMensagem()));
-        when(mensagemRepository.listarMensagens(any(Pageable.class))).thenReturn(listaDeMensagens);
+        @Test
+        void devePermitirListarMensagens_ComPaginacao() {
+            // Arrange
+            Page<Mensagem> listaDeMensagens = new PageImpl<>(Arrays.asList(gerarMensagem(), gerarMensagem()));
+            when(mensagemRepository.listarMensagens(any(Pageable.class))).thenReturn(listaDeMensagens);
 
-        // Act
-        var resultadoObtido = mensagemRepository.listarMensagens(Pageable.unpaged());
+            // Act
+            var resultadoObtido = mensagemRepository.listarMensagens(Pageable.unpaged());
 
-        // Assert
-        assertThat(resultadoObtido).hasSize(2);
-        assertThat(resultadoObtido.getContent()).asList().allSatisfy(mensagem -> {
-            assertThat(mensagem).isNotNull().isInstanceOf(Mensagem.class);
-        });
-        verify(mensagemRepository, times(1)).listarMensagens(any(Pageable.class));
+            // Assert
+            assertThat(resultadoObtido).hasSize(2);
+            assertThat(resultadoObtido.getContent()).asList().allSatisfy(mensagem -> {
+                assertThat(mensagem).isNotNull().isInstanceOf(Mensagem.class);
+            });
+            verify(mensagemRepository, times(1)).listarMensagens(any(Pageable.class));
+        }
     }
 
 }

@@ -6,9 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -31,7 +33,7 @@ public class Mensagem {
     private String conteudo;
 
     @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private Date dataCriacao = new Date();
 
     @Builder.Default
     private int gostei = 0;
