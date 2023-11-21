@@ -14,8 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static br.com.fiap.api.util.MensagemHelper.*;
+import static br.com.fiap.api.util.MensagemHelper.gerarMensagem;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -76,18 +77,17 @@ class MensagemServiceIT {
 
         @Test
         void devePermitirAlterarMensagem() {
-            var mensagem = gerarMensagem();
-            var mensagemAntiga = mensagemService.registrarMensagem(mensagem);
-            var mensagemNova = new Mensagem();
-            mensagemNova.setId(mensagemAntiga.getId());
-            mensagemNova.setConteudo("asdfasdfasfdadsfasf");
+            var id = mensagemService.listarMensagens(Pageable.unpaged()).stream().findFirst().get().getId();
 
-            var resultadoObtido = mensagemService.alterarMensagem(mensagemAntiga.getId(), mensagemNova);
+            var mensagem = Mensagem.builder()
+                    .id(id)
+                    .conteudo("TESTAED")
+                    .build();
 
-            assertThat(resultadoObtido.getId()).isEqualTo(mensagemAntiga.getId());
-            assertThat(resultadoObtido.getConteudo()).isEqualTo(mensagemAntiga.getConteudo());
-            assertThat(resultadoObtido.getUsuario()).isEqualTo(mensagemAntiga.getUsuario());
+            var resultadoObtido = mensagemService.alterarMensagem(id, mensagem);
 
+            assertThat(resultadoObtido.getId()).isEqualTo(mensagem.getId());
+            assertThat(resultadoObtido.getConteudo()).isEqualTo(mensagem.getConteudo());
         }
 
         @Test

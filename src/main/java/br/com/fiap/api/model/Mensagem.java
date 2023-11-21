@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -15,13 +17,14 @@ import java.util.UUID;
 
 @Entity
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Jacksonized
 public class Mensagem {
 
     @Id
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
     @Column(nullable = false)
@@ -32,6 +35,7 @@ public class Mensagem {
     @NotEmpty(message = "o conteúdo não pode estar vazio")
     private String conteudo;
 
+    @CreationTimestamp
     @Builder.Default
     private Date dataCriacao = new Date();
 
