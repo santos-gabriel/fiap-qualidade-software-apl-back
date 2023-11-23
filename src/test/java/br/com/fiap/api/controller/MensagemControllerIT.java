@@ -4,6 +4,7 @@ import br.com.fiap.api.model.Mensagem;
 import br.com.fiap.api.repository.MensagemRepository;
 import br.com.fiap.api.service.MensagemService;
 import br.com.fiap.api.service.MensagemServiceImpl;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import static org.hamcrest.Matchers.hasKey;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 @Transactional
+@ActiveProfiles("test")
 public class MensagemControllerIT {
 
     @LocalServerPort
@@ -59,6 +62,7 @@ public class MensagemControllerIT {
             given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(mensagem)
+                .filter(new AllureRestAssured())
 //                .log().all()
             .when()
                 .post("/mensagens")

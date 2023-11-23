@@ -3,6 +3,9 @@ package br.com.fiap.api.service;
 import br.com.fiap.api.exception.MensagemNotFoundException;
 import br.com.fiap.api.model.Mensagem;
 import br.com.fiap.api.repository.MensagemRepository;
+import io.qameta.allure.Description;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,7 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static br.com.fiap.api.util.MensagemHelper.gerarMensagem;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class MensagemServiceTest {
@@ -43,6 +47,8 @@ class MensagemServiceTest {
     @Nested
     class RegistarMensagem {
         @Test
+        @Severity(SeverityLevel.BLOCKER)
+        @Description("Registrar uma mensagem")
         void devePermitirRegistrarMensagem() {
             // Arrange
             var mensagem = gerarMensagem();
@@ -182,7 +188,7 @@ class MensagemServiceTest {
             assertThatThrownBy(() -> mensagemService.removerMensagem(id)).isInstanceOf(MensagemNotFoundException.class).hasMessage("Mensagem não encontrada");
             verify(mensagemRepository, times(1)).findById(any(UUID.class));
             verify(mensagemRepository, never()).deleteById(any(UUID.class));
-       }
+        }
     }
 
     @Nested
